@@ -1,0 +1,30 @@
+required = [
+  "k8s.io/code-generator/cmd/client-gen",
+  "k8s.io/code-generator/cmd/deepcopy-gen",
+  "k8s.io/code-generator/cmd/informer-gen",
+  "k8s.io/code-generator/cmd/lister-gen",
+]
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.4"
+
+[[constraint]]
+  name = "k8s.io/api"
+  branch = "release-1.9"
+
+[[constraint]]
+  name = "k8s.io/apimachinery"
+  branch = "release-1.9"
+
+[[constraint]]
+  name = "k8s.io/code-generator"
+  branch = "release-1.9"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  branch = "release-6.0"
+
+[[constraint]]
+  name = "github.com/spotahome/kooper"
+  version = "0.2.0"
