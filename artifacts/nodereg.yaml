@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nodereg
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nodereg
+    spec:
+      containers:
+      - name: nodereg
+        image: rossedman/nodereg:0.0.1

@@ -18,6 +18,24 @@ goreleaser --snapshot
 ./dist/darwin_amd64/nodereg --kubeconfig ~/.kube/config --anotation-prefix rossedman.io
 ```
 
+OR
+
+This could be run to attach to a remote cluster
+
+```
+docker run -v $HOME/.kube:/kube rossedman/nodereg:0.0.1 \
+    --kubeconfig /kube/config \
+    --anotation-prefix rossedman.io
+```
+
+OR
+
+This could be used to deploy to a cluster
+
+```
+kubectl apply -f artifacts/nodereg.yaml
+```
+
 Then add an annotation to your nodes that has a url where a `POST` request can be sent, for this demo I just used requestbin.
 
 ```sh
