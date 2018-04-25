@@ -19,6 +19,7 @@ import (
 var (
 	client     *kubernetes.Clientset
 	kubeconfig = flag.String("kubeconfig", "", "Path to a kubeconfig. Only required if out-of-cluster.")
+	annotation = flag.String("annotation-prefix", "rossedman.io", "Prefix for configuring annotations to watch for.")
 )
 
 func main() {
