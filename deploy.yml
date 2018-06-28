@@ -10,6 +10,7 @@ spec:
       labels:
         app: nodereg
     spec:
+      serviceAccountName: datadog
       containers:
       - name: nodereg
         image: rossedman/nodereg:0.0.1
