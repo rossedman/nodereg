@@ -19,7 +19,6 @@ import (
 var (
 	client     *kubernetes.Clientset
 	kubeconfig = flag.String("kubeconfig", "", "Path to a kubeconfig. Only required if out-of-cluster.")
-	annotation = flag.String("annotation-prefix", "rossedman.io", "Prefix for configuring annotations to watch for.")
 )
 
 func main() {
@@ -69,40 +68,46 @@ func main() {
 
 func handleNodeAdd(obj interface{}) {
 	node := obj.(*api.Node)
-	logrus.Infof("analyzing node: %v", node.Name)
+	if !nodeHasRegistered(node.Annotations) {
+		if nodeNeedsToRegister(node.Annotations) {
+			nodeBytes, _ := json.Marshal(&node)
+			nodeToSend := bytes.NewReader(nodeBytes)
 
-	if nodeNeedsToRegister(node.Annotations) {
-		nodeBytes, _ := json.Marshal(&node)
-		nodeToSend := bytes.NewReader(nodeBytes)
+			logrus.Infof("registering node %v", node.Name)
 
-		logrus.Infof("registering node %v", node.Name)
-
-		resp, err := http.Post(node.Annotations["rossedman.io/register"], "application/json", nodeToSend)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode == http.StatusOK {
-			// update annotation to say that its registered
-			node.Annotations["rossedman.io/registered"] = "true"
-			_, err := client.CoreV1().Nodes().Update(node)
+			resp, err := http.Post(node.Annotations["rossedman.io/register"], "application/json", nodeToSend)
 			if err != nil {
 				logrus.Fatal(err)
 			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode == http.StatusOK {
+				// update annotation to say that its registered
+				node.Annotations["rossedman.io/registered"] = "true"
+				_, err := client.CoreV1().Nodes().Update(node)
+				if err != nil {
+					logrus.Fatal(err)
+				}
+			}
 		}
 	} else {
-		logrus.Infof("skipping node %v", node.Name)
+		logrus.Infof("node has registered: %v", node.Name)
 	}
 }
 
-func nodeNeedsToRegister(annotations map[string]string) bool {
-	for k, a := range annotations {
+func nodeHasRegistered(annotations map[string]string) bool {
+	for k := range annotations {
 		if k == "rossedman.io/registered" {
-			if a == "true" {
-				return false
-			}
+			return true
 		}
+	}
+
+	return false
+}
+
+func nodeNeedsToRegister(annotations map[string]string) bool {
+
+	for k := range annotations {
 		if k == "rossedman.io/register" {
 			return true
 		}
